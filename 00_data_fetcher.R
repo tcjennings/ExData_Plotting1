@@ -1,7 +1,6 @@
 #This script will fetch data necessary to complete the work if the available file does not exist in the working directory.
 #Operations common to all four plot scripts will be performed here and source()'d from each plot script.
 
-library(data.table)
 library(dplyr)
 
 # The source file and its unzipped components are not part of the git repository.
@@ -17,8 +16,9 @@ if (! file.exists(source_file)) {
 
 input_file <- "household_power_consumption.txt"
 
-#Read the input_file as a data.table. Input file is ;-delimited and includes 9 columns. NA values are represented as "?"
-dt <- fread(input_file,sep=";",na.strings="?")
+#Using data.frame instead of data.table because data.table does not support the POSIXlt class we want to use for DateTime
+#Read the input_file as a data.frame. Input file is ;-delimited and includes 9 columns. NA values are represented as "?"
+dt <- read.table(input_file,sep=";",na.strings="?",header=TRUE)
 
 #dt should have dimensions 2075259 rows x 9 columns
 if ( sum(dim(dt) == c(2075259,9)) < 2 ) {
@@ -30,6 +30,7 @@ left_date <- as.Date("2007-02-01")
 right_date <- as.Date("2007-02-02")
 dt <- dt %>% mutate( Date=as.Date(Date,format="%d/%m/%Y") ) %>%
              filter( between(Date,left_date,right_date) )
-#Given the shorter data.table, we will now efficiently mutate the Time field as time instead of character.
+
+#Given the shorter data.frame, we will now efficiently create a DateTime field
 #The time zone is not specified, so we will allow the TZ to be the local time
-#             mutate( Time=strptime(Time,format="%H:%M:%S"))
+dt$DateTime=strptime(paste(dt$Date,dt$Time),format="%Y-%m-%d %H:%M:%S")
