@@ -1,6 +1,7 @@
 #This script creates plot4.png
 
-#First, use the 00_data_fetcher.R script to download and unpack the source data if necessary. This script also sets the input_file variable.
+#First, use the 00_data_fetcher.R script to download and unpack the source data if necessary. This script also loads the data set.
+#If the dt variable doesn't exist in the environmnet, run the script to load and check the data we need.
 if (! exists("dt") ) {
   source("./00_data_fetcher.R")
 }
